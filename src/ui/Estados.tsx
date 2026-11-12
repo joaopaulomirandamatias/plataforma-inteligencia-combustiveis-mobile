@@ -3,6 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { cores, raio } from "@/tema/tokens";
 import { Icone, type NomeIcone } from "@/ui/Icone";
+import { Entrada, Pulso } from "@/ui/Movimento";
 import { Cartao } from "@/ui/Superficies";
 import { Texto } from "@/ui/Texto";
 
@@ -24,7 +25,7 @@ export function EstadoMensagem({
   children?: ReactNode;
 }) {
   return (
-    <View style={estilos.estado}>
+    <Entrada style={estilos.estado}>
       <View style={estilos.selo}>
         <Icone nome={icone} tamanho={30} cor={cores.petroleo} />
       </View>
@@ -40,7 +41,7 @@ export function EstadoMensagem({
         </Texto>
       ) : null}
       {children ? <View style={{ gap: 8, marginTop: 8 }}>{children}</View> : null}
-    </View>
+    </Entrada>
   );
 }
 
@@ -63,12 +64,14 @@ function Osso({ largura, altura = 14 }: { largura: `${number}%` | number; altura
 export function EsqueletoCartao() {
   return (
     <Cartao accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Osso largura="72%" altura={18} />
-      <Osso largura="54%" />
-      <View style={{ flexDirection: "row", gap: 6 }}>
-        <Osso largura={140} altura={24} />
-        <Osso largura={104} altura={24} />
-      </View>
+      <Pulso style={{ gap: 10 }}>
+        <Osso largura="72%" altura={18} />
+        <Osso largura="54%" />
+        <View style={{ flexDirection: "row", gap: 6 }}>
+          <Osso largura={140} altura={24} />
+          <Osso largura={104} altura={24} />
+        </View>
+      </Pulso>
     </Cartao>
   );
 }

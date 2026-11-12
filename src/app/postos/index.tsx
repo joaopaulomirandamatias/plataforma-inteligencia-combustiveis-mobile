@@ -10,6 +10,7 @@ import { cores } from "@/tema/tokens";
 import { Botao } from "@/ui/Botao";
 import { CartaoPosto } from "@/ui/CartaoPosto";
 import { Carregando, EsqueletoLista, EstadoMensagem } from "@/ui/Estados";
+import { atrasoDoItem, Entrada } from "@/ui/Movimento";
 import { BarraTopo, Tela } from "@/ui/Tela";
 import { Texto } from "@/ui/Texto";
 
@@ -99,7 +100,12 @@ export default function Resultados() {
         data={postos}
         keyExtractor={(posto) => posto.posto_id}
         contentContainerStyle={{ padding: 16, gap: 10, paddingBottom: 24 + margens.bottom }}
-        renderItem={({ item }) => <CartaoPosto posto={item} />}
+        renderItem={({ item, index }) => (
+          // Só a primeira página entra escalonada; as seguintes aparecem direto.
+          <Entrada atraso={index < 30 ? atrasoDoItem(index) : 0}>
+            <CartaoPosto posto={item} />
+          </Entrada>
+        )}
         ListHeaderComponent={
           <Texto variante="pequeno" cor={cores.tintaSuave} accessibilityLiveRegion="polite">
             {postos.length} {postos.length === 1 ? "posto exibido" : "postos exibidos"}

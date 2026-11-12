@@ -33,6 +33,24 @@ outro ambiente, troque `EXPO_PUBLIC_PIC_API_URL` e `EXPO_PUBLIC_PIC_SITE_URL`.
 Instalar um pacote novo: use sempre `npx expo install <pacote>`, que resolve a
 versão compatível com o SDK.
 
+## Ver o app no navegador
+
+```bash
+npm run previa
+```
+
+```bash
+npm run previa:amostra
+```
+
+O primeiro comando liga a prévia à API real; o segundo usa dados fictícios
+(`scripts/amostra.mjs`) e mostra uma faixa “DADOS DE AMOSTRA” no topo. A prévia
+abre em `http://localhost:8080`.
+
+A prévia tem um servidor próprio (`scripts/previa-web.mjs`) porque a API
+pública não aceita chamadas diretas de navegador: ele repassa `/_pic/*` para a
+API, na mesma origem da página. Em Android e iOS o app fala com a API direto.
+
 ## Conferir antes de enviar
 
 ```bash
@@ -113,6 +131,19 @@ src/
 6. **Localização só por ação do usuário.** A permissão é pedida ao tocar em
    “Usar minha localização”, a coordenada é arredondada a cerca de 1 km antes
    de ir à API e nunca é gravada.
+
+## Movimento
+
+O app tem pouca animação, e toda ela tem função (`src/ui/Movimento.tsx`):
+
+- conteúdo que chega entra subindo 10 pt e aparecendo em 240 ms — listas entram
+  em sequência e cada aba da ficha anuncia a troca assim;
+- os blocos de carregamento pulsam enquanto a consulta não volta;
+- a estrela do favorito cresce e volta quando é tocada;
+- folhas inferiores sobem; telas deslizam com a transição padrão do sistema.
+
+Com “reduzir movimento” ligado no aparelho, nada desliza nem pulsa: o conteúdo
+simplesmente aparece.
 
 ## Funcionamento offline
 

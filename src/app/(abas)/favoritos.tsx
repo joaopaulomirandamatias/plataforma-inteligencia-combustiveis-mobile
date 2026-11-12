@@ -9,6 +9,7 @@ import { cores } from "@/tema/tokens";
 import { Botao, BotaoIcone } from "@/ui/Botao";
 import { CartaoPosto } from "@/ui/CartaoPosto";
 import { EstadoMensagem } from "@/ui/Estados";
+import { atrasoDoItem, Entrada } from "@/ui/Movimento";
 import { BarraTopo, Tela } from "@/ui/Tela";
 import { Texto } from "@/ui/Texto";
 
@@ -42,7 +43,8 @@ export default function Favoritos() {
               {MENSAGENS.favoritos.rodape}
             </Texto>
           }
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
+            <Entrada atraso={atrasoDoItem(index)}>
             <CartaoPosto
               posto={item}
               complemento={`salvo em ${dataBr(item.quando)}`}
@@ -61,6 +63,7 @@ export default function Favoritos() {
                 </View>
               }
             />
+            </Entrada>
           )}
         />
       )}

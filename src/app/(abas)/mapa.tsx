@@ -16,6 +16,7 @@ import { Chip } from "@/ui/Controles";
 import { EsqueletoLista, EstadoMensagem } from "@/ui/Estados";
 import { Icone } from "@/ui/Icone";
 import { MAPA_DISPONIVEL, MapaPostos } from "@/ui/MapaPostos";
+import { atrasoDoItem, Entrada } from "@/ui/Movimento";
 import { Aviso } from "@/ui/Superficies";
 import { BarraTopo, Corpo, Tela } from "@/ui/Tela";
 import { Texto } from "@/ui/Texto";
@@ -235,7 +236,7 @@ export default function PertoDeMim() {
           </View>
 
           {postoSelecionado ? (
-            <View style={[estilos.cartaoSelecionado, { marginBottom: 12 }]}>
+            <Entrada key={postoSelecionado.posto_id} style={[estilos.cartaoSelecionado, { marginBottom: 12 }]}>
               <CartaoPosto
                 posto={postoSelecionado}
                 complemento={[distanciaBr(postoSelecionado.distancia_m), origemDaPosicao(postoSelecionado.fonte)]
@@ -263,7 +264,7 @@ export default function PertoDeMim() {
                   </View>
                 }
               />
-            </View>
+            </Entrada>
           ) : null}
         </View>
       ) : (
@@ -279,11 +280,13 @@ export default function PertoDeMim() {
               corpo={MENSAGENS.proximos.vazio.corpo}
             />
           }
-          renderItem={({ item }) => (
-            <CartaoPosto
-              posto={item}
-              complemento={[distanciaBr(item.distancia_m), origemDaPosicao(item.fonte)].filter(Boolean).join(" · ")}
-            />
+          renderItem={({ item, index }) => (
+            <Entrada atraso={atrasoDoItem(index)}>
+              <CartaoPosto
+                posto={item}
+                complemento={[distanciaBr(item.distancia_m), origemDaPosicao(item.fonte)].filter(Boolean).join(" · ")}
+              />
+            </Entrada>
           )}
         />
       )}

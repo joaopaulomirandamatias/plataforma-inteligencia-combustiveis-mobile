@@ -50,7 +50,10 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "exportar:web": "expo export --platform web"
+    "exportar:web": "expo export --platform web",
+    "previa:exportar": "EXPO_PUBLIC_PIC_API_URL=/_pic expo export --platform web",
+    "previa": "npm run previa:exportar && node scripts/previa-web.mjs",
+    "previa:amostra": "npm run previa:exportar && node scripts/previa-web.mjs --amostra"
   },
   "private": true,
   "description": "Combustível em Dia — aplicativo do consumidor da Plataforma de Inteligência de Combustíveis",

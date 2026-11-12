@@ -7,6 +7,7 @@ import { MENSAGENS } from "@/lib/mensagens";
 import { cores, fontes, raio } from "@/tema/tokens";
 import { Botao } from "@/ui/Botao";
 import { Icone } from "@/ui/Icone";
+import { Entrada } from "@/ui/Movimento";
 import { Texto } from "@/ui/Texto";
 
 function concluir(destino: "/" | "/sobre") {
@@ -37,7 +38,8 @@ export default function BoasVindas() {
       </View>
 
       {/* Os dois cartões antecipam a linguagem de procedência usada no app. */}
-      <View style={{ gap: 8, marginTop: 32 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Entrada atraso={80} style={{ gap: 8, marginTop: 32 }}>
+      <View style={{ gap: 8 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         <View style={[estilos.amostra, estilos.amostraOficial]}>
           <View style={[estilos.etiqueta, { backgroundColor: cores.branco }]}>
             <Icone nome="escudo" tamanho={14} cor={cores.petroleo} />
@@ -68,11 +70,15 @@ export default function BoasVindas() {
         </View>
       </View>
 
-      <Texto style={estilos.titulo} accessibilityRole="header">
-        {MENSAGENS.boasVindas.titulo}
-      </Texto>
+      </Entrada>
 
-      <View style={{ gap: 16, marginTop: 22 }}>
+      <Entrada atraso={200}>
+        <Texto style={estilos.titulo} accessibilityRole="header">
+          {MENSAGENS.boasVindas.titulo}
+        </Texto>
+      </Entrada>
+
+      <Entrada atraso={320} style={{ gap: 16, marginTop: 22 }}>
         {MENSAGENS.boasVindas.pontos.map((ponto) => (
           <View key={ponto.titulo} style={estilos.ponto}>
             <View style={{ marginTop: 2 }}>
@@ -88,9 +94,9 @@ export default function BoasVindas() {
             </View>
           </View>
         ))}
-      </View>
+      </Entrada>
 
-      <View style={{ gap: 8, marginTop: 32 }}>
+      <Entrada atraso={440} style={{ gap: 8, marginTop: 32 }}>
         <Botao rotulo="Começar a consultar" onPress={() => concluir("/")} />
         <Botao
           rotulo="Como os dados são reunidos"
@@ -101,7 +107,7 @@ export default function BoasVindas() {
         <Texto variante="pequeno" cor={cores.sobrePetroleoSuave} centro>
           {MENSAGENS.boasVindas.rodape}
         </Texto>
-      </View>
+      </Entrada>
     </ScrollView>
   );
 }

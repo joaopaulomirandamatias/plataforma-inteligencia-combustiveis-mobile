@@ -16,6 +16,7 @@ import { cores, TOQUE } from "@/tema/tokens";
 import { Botao, BotaoIcone } from "@/ui/Botao";
 import { EsqueletoLista, EstadoMensagem } from "@/ui/Estados";
 import { Icone } from "@/ui/Icone";
+import { Destaque, Entrada } from "@/ui/Movimento";
 import { BarraTopo, Corpo, Tela } from "@/ui/Tela";
 import { Texto } from "@/ui/Texto";
 
@@ -119,14 +120,16 @@ export default function Ficha() {
         acoes={
           <>
             <BotaoIcone rotuloAcessivel="Compartilhar esta ficha" icone="compartilhar" onPress={() => setFolha("compartilhar")} />
-            <BotaoIcone
-              rotuloAcessivel={favorito ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-              accessibilityState={{ selected: favorito }}
-              icone="estrela"
-              cor={favorito ? cores.ambar : cores.branco}
-              preenchimento={favorito ? cores.ambar : "none"}
-              onPress={() => alternarFavorito(posto)}
-            />
+            <Destaque gatilho={favorito}>
+              <BotaoIcone
+                rotuloAcessivel={favorito ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                accessibilityState={{ selected: favorito }}
+                icone="estrela"
+                cor={favorito ? cores.ambar : cores.branco}
+                preenchimento={favorito ? cores.ambar : "none"}
+                onPress={() => alternarFavorito(posto)}
+              />
+            </Destaque>
           </>
         }
       />
@@ -236,6 +239,8 @@ export default function Ficha() {
           </View>
         ) : null}
 
+        {/* A `key` refaz a entrada a cada troca de aba. */}
+        <Entrada key={aba}>
         {aba === "resumo" ? <SecaoResumo posto={posto} contexto={contexto.data} irPara={setAba} /> : null}
         {aba === "qualidade" ? <SecaoQualidade qualidade={posto.qualidade_combustivel} /> : null}
         {aba === "precos" ? (
@@ -249,6 +254,7 @@ export default function Ficha() {
         {aba === "cadastro" ? <SecaoCadastro posto={posto} /> : null}
         {aba === "posto" ? <SecaoDoPosto /> : null}
         {aba === "fontes" ? <SecaoFontes posto={posto} salvoEm={ficha.dataUpdatedAt} /> : null}
+        </Entrada>
       </Corpo>
 
       <FolhaOutraData visivel={folha === "data"} aoFechar={() => setFolha(null)} aoEscolher={verEm} />

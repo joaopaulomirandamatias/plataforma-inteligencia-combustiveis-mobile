@@ -9,6 +9,7 @@ import { contarEnsaios, resumirQualidade } from "@/lib/qualidade";
 import { cores, TOQUE } from "@/tema/tokens";
 import { Classificacao, Etiqueta } from "@/ui/Etiqueta";
 import { Icone } from "@/ui/Icone";
+import { Entrada } from "@/ui/Movimento";
 import { Aviso, CabecalhoSecao, Cartao, Divisor, LinhaNavegacao } from "@/ui/Superficies";
 import { Texto } from "@/ui/Texto";
 
@@ -98,13 +99,13 @@ function CartaoAgrupamento({ agrupamento, abertoDeInicio }: { agrupamento: Agrup
       </Pressable>
 
       {aberto ? (
-        <View style={{ marginTop: -10 }}>
+        <Entrada style={{ marginTop: -10 }}>
           {agrupamento.ensaios.map((ensaio, indice) => (
             // Chave montada só com dado que já está na tela (política de
             // linguagem: `key` nunca leva dado de auditoria).
             <LinhaEnsaio key={`${ensaio.ensaio}-${indice}`} ensaio={ensaio} />
           ))}
-        </View>
+        </Entrada>
       ) : null}
     </Cartao>
   );
