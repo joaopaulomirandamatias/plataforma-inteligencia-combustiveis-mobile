@@ -40,17 +40,17 @@ function LinhaEnsaio({ ensaio }: { ensaio: EnsaioPMQC }) {
         </Texto>
         <Classificacao classificacao={ensaio.classificacao} />
       </View>
-      <View style={estilos.linhaEntre}>
-        <Texto variante="mono" style={{ flex: 1, fontSize: 13 }}>
-          {resultado}
-          {ensaio.resultado && !ensaio.unidade ? " · unidade não informada" : ""}
-        </Texto>
-        {/* Fonte e data repetidas em cada ensaio de propósito: o detalhe
-            precisa continuar autocontido quando lido isoladamente. */}
-        <Texto variante="fonte">
-          {nomeFonte(ensaio.fonte)} · {dataBr(ensaio.data_coleta)}
-        </Texto>
-      </View>
+      {/* Resultado em linha própria: os textos reais da fonte são longos
+          ("Límpido e isento de impurezas") e não cabem ao lado da procedência. */}
+      <Texto variante="mono" style={{ fontSize: 13 }}>
+        {resultado}
+        {ensaio.resultado && !ensaio.unidade ? " · unidade não informada" : ""}
+      </Texto>
+      {/* Fonte e data repetidas em cada ensaio de propósito: o detalhe
+          precisa continuar autocontido quando lido isoladamente. */}
+      <Texto variante="fonte">
+        {nomeFonte(ensaio.fonte)} · {dataBr(ensaio.data_coleta)}
+      </Texto>
     </View>
   );
 }
