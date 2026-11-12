@@ -1,0 +1,84 @@
+# CI do aplicativo — mesmo desenho do portal (`web/.woodpecker/ci.yml`).
+#
+# O Woodpecker clona UM repositório. O léxico canônico da política de linguagem
+# mora no repositório de docs, que é PÚBLICO: o passo `lexico-canonico` o clona
+# sem credencial nenhuma. O teste `src/testes/paridade.test.ts` lê o arquivo
+# desse caminho; sem ele em disco o teste PULA fora de CI e FALHA dentro dela —
+# uma conferência que não pôde acontecer não é um verde.
+#
+# A paridade confere contra `main` do repositório de docs, não contra um SHA
+# pinado: o léxico é o mesmo valor espelhado em quatro lugares (docs, backend,
+# portal e app), e a propriedade que precisa valer é igualdade AGORA.
+#
+# `DOCS_SHA` só é informado em pipeline manual, para reproduzir uma execução.
+
+when:
+  - event: push
+    branch: main
+  - event: pull_request
+    branch: main
+  - event: manual
+
+variables:
+  - &node_image 'node:22'
+
+steps:
+  - name: lexico-canonico
+    image: *node_image
+    environment:
+      DOCS_SHA: ''
+    commands:
+      - |
+        REF="main"
+        if [ -n "$${DOCS_SHA:-}" ]; then
+          case "$DOCS_SHA" in
+            *[!0-9a-f]*|"") echo "ERRO: DOCS_SHA precisa ser um SHA Git completo (40 hexadecimais)." >&2; exit 1 ;;
+          esac
+          if [ "$${#DOCS_SHA}" -ne 40 ]; then
+            echo "ERRO: DOCS_SHA precisa ter 40 caracteres." >&2
+            exit 1
+          fi
+          REF="$DOCS_SHA"
+        fi
+        git clone --quiet https://github.com/joaopaulomirandamatias/plataforma-inteligencia-combustiveis-docs.git .lexico-docs
+        cd .lexico-docs
+        git checkout --quiet "$REF"
+        ARQUIVO="docs/agentes/lexico-bloqueado.json"
+        if [ ! -f "$ARQUIVO" ]; then
+          echo "ERRO: lexico canonico ausente em .lexico-docs/$ARQUIVO." >&2
+          exit 1
+        fi
+        echo "Lexico conferido contra docs '$REF' @ $(git rev-parse HEAD)"
+
+  - name: dependencias
+    image: *node_image
+    commands:
+      - npm ci --no-audit
+
+  - name: typecheck
+    image: *node_image
+    commands:
+      - npx tsc --noEmit
+
+  - name: lint
+    image: *node_image
+    commands:
+      - npx expo lint
+
+  - name: testes
+    image: *node_image
+    environment:
+      PIC_LEXICO_CANONICO: '.lexico-docs/docs/agentes/lexico-bloqueado.json'
+      CI: 'true'
+    commands:
+      - npx jest --ci
+
+  # Prova que o pacote monta. A exportação web usa o mesmo código das telas
+  # nativas (react-native-web) e é o que a conferência visual abre no navegador.
+  - name: exportar-web
+    image: *node_image
+    environment:
+      EXPO_OFFLINE: '1'
+      CI: 'true'
+    commands:
+      - npx expo export --platform web
