@@ -62,7 +62,7 @@ que permite abrir o app num navegador e conferir as telas sem aparelho.
 | Início e busca | `/` | `GET /saude` |
 | Resultados | `/postos?q=&uf=&municipio=` | `GET /v1/postos` |
 | Ficha do posto (6 abas) | `/postos/{posto_id}?as_of=` | `GET /v1/postos/{id}` e `…/contexto-regional` |
-| Perto de mim | `/mapa` | `GET /v1/postos/mapa` (modo raio) |
+| Perto de mim (lista e mapa) | `/mapa` | `GET /v1/postos/mapa` (modo raio) |
 | Favoritos | `/favoritos` | — (guardado no aparelho) |
 | Alertas | `/alertas` | — (depende de serviço ainda inexistente) |
 | Conta e privacidade | `/conta` | — |
@@ -125,9 +125,27 @@ src/
 - A consulta de postos próximos é a única que não vai para o disco: a chave
   dela contém a coordenada do usuário.
 
+## Mapa
+
+A aba Perto tem lista e mapa (`react-native-maps`). O mapa existe só em Android
+e iOS; no navegador a aba mostra a lista.
+
+- **iOS:** usa o mapa do sistema, sem chave.
+- **Android:** o SDK do Google fecha o app se o build não tiver chave. Por isso
+  o modo mapa só aparece quando há chave em `app.json`
+  (`android.config.googleMaps.apiKey`) ou dentro do Expo Go. A chave não está no
+  repositório: precisa ser criada e configurada antes do build de Android.
+- O marcador é igual para todos os postos. Cheio quer dizer posição publicada
+  pela ANP; contorno tracejado, posição estimada pelo endereço.
+- O mapa não mostra a posição exata do usuário: mostra o círculo do raio
+  consultado, em volta do centro já arredondado.
+
+O mapa foi conferido por teste do componente (com o SDK simulado) e pelo
+empacotamento para iOS e Android. **Ainda não foi aberto num aparelho.**
+
 ## O que ainda não está aqui
 
-Mapa nativo com marcadores, os testes que o consumidor pode pedir no posto e o
+Os testes que o consumidor pode pedir no posto e o
 que conferir no local (dependem de conteúdo com referência jurídica revisada),
 calculadora etanol × gasolina e as telas que dependem de backend novo (dados
 declarados pelo posto, alertas, conta com sincronização). O detalhe e a ordem

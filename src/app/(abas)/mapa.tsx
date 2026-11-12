@@ -1,19 +1,21 @@
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { FalhaDeConsulta } from "@/api/cliente";
 import { usePostosProximos, type Centro } from "@/api/consultas";
 import { distanciaBr } from "@/lib/formato";
+import { abrirFora, linkDeRota } from "@/lib/links";
 import { MENSAGENS, mensagemDeFalha } from "@/lib/mensagens";
-import { cores } from "@/tema/tokens";
+import { cores, raio, sombraFlutuante, TOQUE } from "@/tema/tokens";
 import { Botao } from "@/ui/Botao";
 import { CartaoPosto } from "@/ui/CartaoPosto";
 import { Chip } from "@/ui/Controles";
 import { EsqueletoLista, EstadoMensagem } from "@/ui/Estados";
 import { Icone } from "@/ui/Icone";
+import { MAPA_DISPONIVEL, MapaPostos } from "@/ui/MapaPostos";
 import { Aviso } from "@/ui/Superficies";
 import { BarraTopo, Corpo, Tela } from "@/ui/Tela";
 import { Texto } from "@/ui/Texto";
@@ -37,6 +39,10 @@ export default function PertoDeMim() {
   const [centro, setCentro] = useState<Centro | null>(null);
   const [etapa, setEtapa] = useState<Etapa>("convite");
   const [raioKm, setRaioKm] = useState(5);
+  const [modo, setModo] = useState<"lista" | "mapa">("lista");
+  const [selecionado, setSelecionado] = useState<string | null>(null);
+  /** Centro do mapa depois de arrastado; `null` enquanto está sobre a consulta. */
+  const [centroArrastado, setCentroArrastado] = useState<Centro | null>(null);
 
   const proximos = usePostosProximos(centro, raioKm * 1000);
 
@@ -116,17 +122,48 @@ export default function PertoDeMim() {
 
   const itens = proximos.data?.itens ?? [];
   const falha = proximos.error instanceof FalhaDeConsulta ? proximos.error : null;
+  const postoSelecionado = itens.find((ponto) => ponto.posto_id === selecionado) ?? null;
+  const origemDaPosicao = (fonte: string) =>
+    fonte === "GEO-ANP" ? MENSAGENS.proximos.posicaoAnp : MENSAGENS.proximos.posicaoEstimada;
+
+  const alternador = MAPA_DISPONIVEL ? (
+    <View style={estilos.alternador} accessibilityRole="tablist" accessibilityLabel="Modo de exibição">
+      {(["lista", "mapa"] as const).map((opcao) => (
+        <Pressable
+          key={opcao}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: modo === opcao }}
+          onPress={() => setModo(opcao)}
+          style={[estilos.opcaoModo, modo === opcao ? estilos.opcaoModoAtiva : null]}
+        >
+          <Texto variante="pequenoForte" cor={modo === opcao ? cores.branco : cores.petroleo} style={{ fontSize: 14 }}>
+            {opcao === "lista" ? "Lista" : "Mapa"}
+          </Texto>
+        </Pressable>
+      ))}
+    </View>
+  ) : null;
 
   const cabecalho = (
     <View style={{ gap: 10 }}>
+      {alternador}
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }} accessibilityLabel="Distância máxima">
         {RAIOS_KM.map((km) => (
-          <Chip key={km} rotulo={`Até ${km} km`} ativo={km === raioKm} onPress={() => setRaioKm(km)} />
+          <Chip
+            key={km}
+            rotulo={`Até ${km} km`}
+            ativo={km === raioKm}
+            onPress={() => {
+              setRaioKm(km);
+              setSelecionado(null);
+              setCentroArrastado(null);
+            }}
+          />
         ))}
       </View>
       {proximos.data ? (
         <Texto variante="pequeno" cor={cores.tintaSuave} accessibilityLiveRegion="polite">
-          {itens.length} {itens.length === 1 ? "posto" : "postos"} com posição conhecida · do mais próximo ao mais distante
+          {itens.length} {itens.length === 1 ? "posto" : "postos"} com posição conhecida · pela distância informada
         </Texto>
       ) : null}
       {proximos.data?.truncado ? <Aviso>{MENSAGENS.proximos.truncado}</Aviso> : null}
@@ -154,6 +191,81 @@ export default function PertoDeMim() {
         >
           <Botao rotulo="Tentar novamente" icone="recarregar" onPress={() => void proximos.refetch()} />
         </EstadoMensagem>
+      ) : modo === "mapa" && MAPA_DISPONIVEL ? (
+        <View style={{ flex: 1 }}>
+          <MapaPostos
+            centro={centro}
+            raioMetros={raioKm * 1000}
+            pontos={itens}
+            selecionado={selecionado}
+            aoSelecionar={setSelecionado}
+            aoMoverCentro={setCentroArrastado}
+          />
+          <View style={estilos.sobreOMapa} pointerEvents="box-none">
+            <View style={estilos.painel}>{cabecalho}</View>
+            {centroArrastado ? (
+              <Botao
+                rotulo="Buscar nesta área"
+                icone="busca"
+                variante="escuro"
+                compacto
+                onPress={() => {
+                  setCentro({ latitude: aproximar(centroArrastado.latitude), longitude: aproximar(centroArrastado.longitude) });
+                  setCentroArrastado(null);
+                  setSelecionado(null);
+                }}
+                estilo={{ alignSelf: "center", ...sombraFlutuante }}
+              />
+            ) : null}
+          </View>
+
+          <View style={estilos.legenda} accessibilityRole="text">
+            <View style={estilos.itemLegenda}>
+              <View style={estilos.amostraAnp} />
+              <Texto variante="pequeno" style={{ fontSize: 12 }}>
+                Posição ANP
+              </Texto>
+            </View>
+            <View style={estilos.itemLegenda}>
+              <View style={estilos.amostraEstimada} />
+              <Texto variante="pequeno" style={{ fontSize: 12 }}>
+                Estimada pelo endereço
+              </Texto>
+            </View>
+          </View>
+
+          {postoSelecionado ? (
+            <View style={[estilos.cartaoSelecionado, { marginBottom: 12 }]}>
+              <CartaoPosto
+                posto={postoSelecionado}
+                complemento={[distanciaBr(postoSelecionado.distancia_m), origemDaPosicao(postoSelecionado.fonte)]
+                  .filter(Boolean)
+                  .join(" · ")}
+                rodape={
+                  <View style={{ flexDirection: "row", gap: 8 }}>
+                    <Botao
+                      rotulo="Ver ficha"
+                      compacto
+                      onPress={() => router.push(`/postos/${encodeURIComponent(postoSelecionado.posto_id)}`)}
+                      estilo={{ flex: 1 }}
+                    />
+                    <Botao
+                      rotulo="Rota"
+                      icone="rota"
+                      variante="secundario"
+                      compacto
+                      onPress={() =>
+                        void abrirFora(
+                          linkDeRota({ latitude: postoSelecionado.latitude, longitude: postoSelecionado.longitude }),
+                        )
+                      }
+                    />
+                  </View>
+                }
+              />
+            </View>
+          ) : null}
+        </View>
       ) : (
         <FlatList
           data={itens}
@@ -170,12 +282,7 @@ export default function PertoDeMim() {
           renderItem={({ item }) => (
             <CartaoPosto
               posto={item}
-              complemento={[
-                distanciaBr(item.distancia_m),
-                item.fonte === "GEO-ANP" ? MENSAGENS.proximos.posicaoAnp : MENSAGENS.proximos.posicaoEstimada,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
+              complemento={[distanciaBr(item.distancia_m), origemDaPosicao(item.fonte)].filter(Boolean).join(" · ")}
             />
           )}
         />
@@ -183,3 +290,41 @@ export default function PertoDeMim() {
     </Tela>
   );
 }
+
+const estilos = StyleSheet.create({
+  alternador: {
+    flexDirection: "row",
+    alignSelf: "flex-start",
+    borderWidth: 1.5,
+    borderColor: cores.petroleo,
+    borderRadius: raio.controle,
+    overflow: "hidden",
+  },
+  opcaoModo: { minHeight: TOQUE, paddingHorizontal: 18, justifyContent: "center", backgroundColor: cores.branco },
+  opcaoModoAtiva: { backgroundColor: cores.petroleo },
+  sobreOMapa: { position: "absolute", top: 12, left: 12, right: 12, gap: 10 },
+  painel: { backgroundColor: cores.branco, borderRadius: raio.cartao, padding: 12, ...sombraFlutuante },
+  legenda: {
+    position: "absolute",
+    left: 12,
+    bottom: 12,
+    flexDirection: "row",
+    gap: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: cores.branco,
+    ...sombraFlutuante,
+  },
+  itemLegenda: { flexDirection: "row", alignItems: "center", gap: 6 },
+  amostraAnp: { width: 12, height: 12, borderRadius: 6, backgroundColor: cores.petroleo },
+  amostraEstimada: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: cores.petroleo,
+    borderStyle: "dashed",
+  },
+  cartaoSelecionado: { position: "absolute", left: 12, right: 12, bottom: 44, ...sombraFlutuante },
+});

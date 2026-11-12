@@ -65,6 +65,15 @@ export function usePostosProximos(centro: Centro | null, raioMetros: number) {
     queryKey: [CHAVE_PROXIMOS, centro?.latitude, centro?.longitude, raioMetros],
     queryFn: ({ signal }) => api.postosProximos(centro as Centro, raioMetros, signal),
     enabled: centro !== null,
+    // O contrato não declara a ordem dos itens no modo raio. A lista é
+    // apresentada pela `distancia_m` que o SERVIDOR calculou — o app só ordena,
+    // não mede. Ponto sem distância vai para o fim.
+    select: (mapa) => ({
+      ...mapa,
+      itens: [...mapa.itens].sort(
+        (a, b) => (a.distancia_m ?? Number.POSITIVE_INFINITY) - (b.distancia_m ?? Number.POSITIVE_INFINITY),
+      ),
+    }),
     // A coordenada não deve sobreviver à sessão: sem persistência (ver
     // `podeGravar`) e coletada da memória logo depois de sair da tela.
     gcTime: 60 * 1000,

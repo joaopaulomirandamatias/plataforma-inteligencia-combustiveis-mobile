@@ -133,7 +133,7 @@ export const MENSAGENS = {
 
   proximos: {
     truncado:
-      "Há mais postos nesta área do que cabem na lista. Os mais próximos aparecem primeiro.",
+      "Há mais postos nesta área do que cabem na lista. Diminua a distância para ver todos.",
     vazio: {
       titulo: "Nenhum posto com posição conhecida por perto",
       corpo:
