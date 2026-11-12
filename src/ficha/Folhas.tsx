@@ -5,6 +5,7 @@ import { Platform, Share, View } from "react-native";
 import { asOfDoDia, formatarDataBr, interpretarDataBr, mascararData, mesesAtras, mesmoDia } from "@/lib/datas";
 import { dataBr } from "@/lib/formato";
 import { linkDaFicha } from "@/lib/links";
+import { NOME_DO_APP, SUBTITULO_DO_APP } from "@/lib/marca";
 import { MENSAGENS } from "@/lib/mensagens";
 import { cores, fontes, raio } from "@/tema/tokens";
 import { Botao } from "@/ui/Botao";
@@ -135,7 +136,7 @@ export function FolhaCompartilhar({
       <View style={{ borderRadius: raio.cartao, overflow: "hidden", borderWidth: 1, borderColor: cores.linha }}>
         <View style={{ backgroundColor: cores.petroleo, padding: 14, gap: 2 }}>
           <Texto variante="pequenoForte" cor={cores.ambar} style={{ fontSize: 12 }}>
-            Combustível em Dia · consulta pública
+            {NOME_DO_APP} · {SUBTITULO_DO_APP}
           </Texto>
           <Texto variante="titulo3" cor={cores.branco}>
             {nome}

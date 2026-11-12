@@ -8,6 +8,7 @@ import { useSaude } from "@/api/consultas";
 import { useLoja } from "@/armazenamento/loja";
 import { lojaPreferencias, lojaRecentes } from "@/armazenamento/usuario";
 import { dataBr, nomeFonte, nomeProprio } from "@/lib/formato";
+import { NOME_DO_APP, SUBTITULO_DO_APP } from "@/lib/marca";
 import { MENSAGENS } from "@/lib/mensagens";
 import { cores, raio } from "@/tema/tokens";
 import { Botao } from "@/ui/Botao";
@@ -62,10 +63,10 @@ export default function Inicio() {
           </View>
           <View>
             <Texto variante="corpoForte" cor={cores.branco}>
-              Combustível em Dia
+              {NOME_DO_APP}
             </Texto>
             <Texto variante="pequeno" cor={cores.sobrePetroleoSuave}>
-              consulta pública
+              {SUBTITULO_DO_APP}
             </Texto>
           </View>
         </View>

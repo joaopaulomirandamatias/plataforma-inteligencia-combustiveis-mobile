@@ -56,7 +56,7 @@
     "previa:amostra": "npm run previa:exportar && node scripts/previa-web.mjs --amostra"
   },
   "private": true,
-  "description": "Combustível em Dia — aplicativo do consumidor da Plataforma de Inteligência de Combustíveis",
+  "description": "PIC Verifica — aplicativo do consumidor da Plataforma de Inteligência de Combustíveis",
   "jest": {
     "preset": "jest-expo",
     "setupFilesAfterEnv": [

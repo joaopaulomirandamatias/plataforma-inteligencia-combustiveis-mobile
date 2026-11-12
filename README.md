@@ -1,8 +1,13 @@
-# Combustível em Dia — aplicativo do consumidor
+# PIC Verifica — aplicativo do consumidor
 
 Aplicativo móvel da Plataforma de Inteligência de Combustíveis (PIC): busca de
 postos e ficha com o que as fontes públicas registram, cada informação com
 **data e fonte visíveis**.
+
+Este repositório é o gate **G6-A** do produto PIC Verifica (consulta pública,
+mapa e ficha). “Verificar abastecimento” e “Relatar ocorrência” são gates
+posteriores e não aparecem no app. O portal web mantém a marca dele
+(“Combustível em Dia”); os links compartilhados pelo app abrem o portal.
 
 Feito com React Native (Expo 58, Expo Router, TypeScript).
 

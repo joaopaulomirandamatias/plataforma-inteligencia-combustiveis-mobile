@@ -22,11 +22,14 @@ import { onlineManager, QueryClient, type Query } from "@tanstack/react-query";
 import type { PersistQueryClientProviderProps } from "@tanstack/react-query-persist-client";
 
 import { FalhaDeConsulta } from "@/api/cliente";
+import { PREFIXO_DE_ARMAZENAMENTO } from "@/lib/marca";
 
 const SETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 
 /** Trocar este valor descarta o cache gravado por versões anteriores. */
 const VERSAO_DO_CACHE = "1";
+
+const CHAVE_DO_CACHE = `${PREFIXO_DE_ARMAZENAMENTO}:consultas`;
 
 export const CHAVE_PROXIMOS = "proximos";
 
@@ -61,7 +64,7 @@ export function podeGravar(consulta: Pick<Query, "queryKey" | "state">): boolean
 export const opcoesDePersistencia: PersistQueryClientProviderProps["persistOptions"] = {
   persister: createAsyncStoragePersister({
     storage: AsyncStorage,
-    key: "combustivel-em-dia:consultas",
+    key: CHAVE_DO_CACHE,
     throttleTime: 1000,
   }),
   maxAge: SETE_DIAS_MS,
@@ -87,5 +90,5 @@ export function acompanharRede(): () => void {
 /** Apaga todas as respostas guardadas no aparelho (Conta › Seus dados). */
 export async function apagarConsultasGuardadas(cliente: QueryClient): Promise<void> {
   cliente.clear();
-  await AsyncStorage.removeItem("combustivel-em-dia:consultas");
+  await AsyncStorage.removeItem(CHAVE_DO_CACHE);
 }

@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { lojaPreferencias } from "@/armazenamento/usuario";
+import { NOME_DO_APP, SUBTITULO_DO_APP } from "@/lib/marca";
 import { MENSAGENS } from "@/lib/mensagens";
 import { cores, fontes, raio } from "@/tema/tokens";
 import { Botao } from "@/ui/Botao";
@@ -29,10 +30,10 @@ export default function BoasVindas() {
         </View>
         <View>
           <Texto variante="destaque" cor={cores.branco}>
-            Combustível em Dia
+            {NOME_DO_APP}
           </Texto>
           <Texto variante="pequeno" cor={cores.sobrePetroleoSuave}>
-            consulta pública
+            {SUBTITULO_DO_APP}
           </Texto>
         </View>
       </View>

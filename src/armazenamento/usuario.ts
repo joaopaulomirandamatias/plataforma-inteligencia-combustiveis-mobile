@@ -5,6 +5,7 @@
  * guardado e apaga tudo com um toque.
  */
 import { criarLoja } from "@/armazenamento/loja";
+import { PREFIXO_DE_ARMAZENAMENTO } from "@/lib/marca";
 
 /** Identificação mínima para listar o posto sem rede. */
 export interface PostoGuardado {
@@ -18,9 +19,13 @@ export interface PostoGuardado {
 
 export const MAXIMO_DE_RECENTES = 5;
 
-export const lojaFavoritos = criarLoja<{ itens: PostoGuardado[] }>("combustivel-em-dia:favoritos", { itens: [] });
+export const lojaFavoritos = criarLoja<{ itens: PostoGuardado[] }>(`${PREFIXO_DE_ARMAZENAMENTO}:favoritos`, {
+  itens: [],
+});
 
-export const lojaRecentes = criarLoja<{ itens: PostoGuardado[] }>("combustivel-em-dia:recentes", { itens: [] });
+export const lojaRecentes = criarLoja<{ itens: PostoGuardado[] }>(`${PREFIXO_DE_ARMAZENAMENTO}:recentes`, {
+  itens: [],
+});
 
 export interface Preferencias {
   viuBoasVindas: boolean;
@@ -31,7 +36,7 @@ export interface Preferencias {
   estatisticasDeUso: boolean;
 }
 
-export const lojaPreferencias = criarLoja<Preferencias>("combustivel-em-dia:preferencias", {
+export const lojaPreferencias = criarLoja<Preferencias>(`${PREFIXO_DE_ARMAZENAMENTO}:preferencias`, {
   viuBoasVindas: false,
   uf: "",
   municipio: "",
