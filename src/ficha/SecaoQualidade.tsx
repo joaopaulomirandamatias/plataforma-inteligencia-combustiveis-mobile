@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
@@ -8,7 +9,7 @@ import { contarEnsaios, resumirQualidade } from "@/lib/qualidade";
 import { cores, TOQUE } from "@/tema/tokens";
 import { Classificacao, Etiqueta } from "@/ui/Etiqueta";
 import { Icone } from "@/ui/Icone";
-import { Aviso, CabecalhoSecao, Cartao, Divisor } from "@/ui/Superficies";
+import { Aviso, CabecalhoSecao, Cartao, Divisor, LinhaNavegacao } from "@/ui/Superficies";
 import { Texto } from "@/ui/Texto";
 
 function Indicador({ valor, rotulo }: { valor: number; rotulo: string }) {
@@ -140,6 +141,14 @@ export function SecaoQualidade({ qualidade }: { qualidade: QualidadeCombustivel 
             </View>
           ))}
         </Cartao>
+        <Cartao style={{ paddingVertical: 2, gap: 0 }}>
+          <LinhaNavegacao
+            titulo="Como ler um resultado"
+            subtitulo="O que cada classificação diz e o que ela não diz"
+            onPress={() => router.push("/guia/qualidade")}
+            ultima
+          />
+        </Cartao>
       </View>
     );
   }
@@ -181,9 +190,14 @@ export function SecaoQualidade({ qualidade }: { qualidade: QualidadeCombustivel 
       ))}
 
       <Aviso>{MENSAGENS.avisoAmostragem}</Aviso>
-      <Texto variante="pequeno" cor={cores.tintaSuave}>
-        {MENSAGENS.avisoAgrupamento}
-      </Texto>
+      <Cartao style={{ paddingVertical: 2, gap: 0 }}>
+        <LinhaNavegacao
+          titulo="Como ler um resultado"
+          subtitulo="O que cada classificação diz e o que ela não diz"
+          onPress={() => router.push("/guia/qualidade")}
+          ultima
+        />
+      </Cartao>
     </View>
   );
 }

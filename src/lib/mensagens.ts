@@ -176,6 +176,82 @@ export const MENSAGENS = {
     apagado: "Dados deste aparelho apagados.",
   },
 
+  outraData: {
+    explicacao:
+      "Mostra somente o que a plataforma já conhecia na data escolhida. Nada publicado " +
+      "depois aparece.",
+    invalida: "Digite uma data válida, no formato dia/mês/ano.",
+    futura: "Escolha hoje ou uma data passada.",
+    aviso: "O link compartilhado a partir da visão histórica abre sempre esta mesma data.",
+    semDados: {
+      titulo: "Sem dados nessa data",
+      corpo:
+        "Na data escolhida a plataforma ainda não tinha registro deste posto. Isso não quer " +
+        "dizer que ele não existia: quer dizer que a base ainda não o conhecia.",
+    },
+  },
+
+  compartilhar: {
+    privacidade:
+      "O link leva só a dados públicos do posto. Nada sobre você, sua busca ou sua " +
+      "localização vai junto.",
+  },
+
+  canais: {
+    intro:
+      "Reclamações e pedidos de fiscalização são recebidos pelos órgãos, não pelo app. Cada " +
+      "contato abre fora daqui.",
+    itens: [
+      {
+        orgao: "ANP · Fale Conosco",
+        assunto: "Qualidade, quantidade e preço de combustíveis",
+        telefone: "0800 970 0267",
+      },
+      {
+        orgao: "Procon do seu estado ou município",
+        assunto: "Relação de consumo, cobrança e informação ao cliente",
+        telefone: null,
+      },
+      {
+        orgao: "IPEM do seu estado",
+        assunto: "Volume entregue pela bomba e lacres do Inmetro",
+        telefone: null,
+      },
+    ],
+    tenhaEmMaos: "CNPJ e endereço do posto, combustível, preço, data e a nota fiscal.",
+    copia: "O botão copia só os dados públicos do posto. Nada seu é enviado.",
+    pendente:
+      "Telefones e endereços de cada estado entrarão aqui quando esse conteúdo for servido " +
+      "pela plataforma.",
+  },
+
+  entenda: {
+    titulo: "Como ler um resultado de ensaio",
+    pmqc:
+      "O PMQC é o programa da ANP que coleta amostras em postos e testa cada uma em " +
+      "laboratório. Cada característica testada é um ensaio, com seu próprio resultado.",
+    leitura: [
+      {
+        classificacao: "não conforme",
+        texto: "Vale para aquele ensaio, naquela coleta. Não descreve o posto hoje.",
+      },
+      {
+        classificacao: "conforme",
+        texto: "Não assegura a qualidade futura nem de todo o estoque.",
+      },
+      {
+        classificacao: "não classificado",
+        texto: "A fonte publicou o resultado sem dizer se ele atende à especificação.",
+      },
+    ],
+    ausencia:
+      "Ficha sem ensaio não é ficha aprovada: o programa coleta em parte dos postos a cada " +
+      "período.",
+    numeros:
+      "O app mostra três contagens separadas e não calcula percentual. A coleta é dirigida " +
+      "e a ficha traz só os grupos mais recentes, então uma taxa não descreveria o posto.",
+  },
+
   naoFaz: [
     "Não dá nota, selo ou posição em ranking a nenhum posto.",
     "Não trata ausência de registro como aprovação.",

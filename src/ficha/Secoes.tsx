@@ -87,6 +87,15 @@ export function SecaoResumo({
       {atos.length > 0 ? <ListaDeFatos titulo="Registros oficiais" fatos={atos} /> : null}
 
       <Aviso>{AVISO_INTERPRETACAO}</Aviso>
+
+      <Cartao style={{ paddingVertical: 2, gap: 0 }}>
+        <LinhaNavegacao
+          titulo="Canais oficiais"
+          subtitulo="Onde registrar reclamação ou pedir fiscalização"
+          onPress={() => router.push({ pathname: "/guia/canais", params: { posto: posto.posto_id } })}
+          ultima
+        />
+      </Cartao>
     </View>
   );
 }

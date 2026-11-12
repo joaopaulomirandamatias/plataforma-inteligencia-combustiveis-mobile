@@ -1,6 +1,6 @@
 import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform, Pressable, RefreshControl, ScrollView, Share, StyleSheet, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 
 import { FalhaDeConsulta } from "@/api/cliente";
 import { useContextoRegional, usePosto } from "@/api/consultas";
@@ -8,9 +8,9 @@ import { useLoja } from "@/armazenamento/loja";
 import { alternarFavorito, ehFavorito, lojaFavoritos, registrarVisita } from "@/armazenamento/usuario";
 import { SecaoPrecos } from "@/ficha/SecaoPrecos";
 import { SecaoQualidade } from "@/ficha/SecaoQualidade";
+import { FolhaCompartilhar, FolhaOutraData } from "@/ficha/Folhas";
 import { SecaoCadastro, SecaoDoPosto, SecaoFontes, SecaoResumo, type AbaFicha } from "@/ficha/Secoes";
 import { cnpjBr, dataBr, instanteBr, nomeProprio } from "@/lib/formato";
-import { linkDaFicha } from "@/lib/links";
 import { MENSAGENS, mensagemDeFalha } from "@/lib/mensagens";
 import { cores, TOQUE } from "@/tema/tokens";
 import { Botao, BotaoIcone } from "@/ui/Botao";
@@ -39,6 +39,7 @@ export default function Ficha() {
   const asOf = parametro(bruto.as_of) ?? null;
 
   const [aba, setAba] = useState<AbaFicha>("resumo");
+  const [folha, setFolha] = useState<"data" | "compartilhar" | null>(null);
   const ficha = usePosto(postoId, asOf);
   const contexto = useContextoRegional(postoId, asOf);
   const favoritos = useLoja(lojaFavoritos).itens;
@@ -64,18 +65,33 @@ export default function Ficha() {
     );
   }
 
+  /** Troca a data da visão sem empilhar telas: voltar sai da ficha, não da data. */
+  function verEm(novoAsOf: string | null) {
+    setFolha(null);
+    router.replace(
+      novoAsOf
+        ? { pathname: "/postos/[postoId]", params: { postoId: postoId as string, as_of: novoAsOf } }
+        : { pathname: "/postos/[postoId]", params: { postoId: postoId as string } },
+    );
+  }
+
   if (!posto) {
     const falha = ficha.error instanceof FalhaDeConsulta ? ficha.error : null;
+    // Com `as_of`, 404 quer dizer "a base ainda não conhecia este posto naquela
+    // data" (piso de transação), não "o posto não existe".
+    const semDadosNaData = asOf !== null && falha?.motivo === "nao_encontrado";
+    const mensagem = semDadosNaData ? MENSAGENS.outraData.semDados : mensagemDeFalha(falha?.motivo ?? "indisponivel");
     return (
       <Tela>
         <BarraTopo titulo="Ficha do posto" />
         {ficha.isError ? (
           <EstadoMensagem
-            icone={falha?.motivo === "sem_conexao" ? "semConexao" : "info"}
-            titulo={mensagemDeFalha(falha?.motivo ?? "indisponivel").titulo}
-            corpo={mensagemDeFalha(falha?.motivo ?? "indisponivel").corpo}
+            icone={falha?.motivo === "sem_conexao" ? "semConexao" : semDadosNaData ? "relogio" : "info"}
+            titulo={mensagem.titulo}
+            corpo={mensagem.corpo}
             alerta
           >
+            {semDadosNaData ? <Botao rotulo="Voltar para a visão atual" onPress={() => verEm(null)} /> : null}
             {falha?.motivo === "nao_encontrado" ? null : (
               <Botao rotulo="Tentar novamente" icone="recarregar" onPress={() => void ficha.refetch()} />
             )}
@@ -96,22 +112,13 @@ export default function Ficha() {
   // em pausa por falta de rede. Nesses casos a data da cópia fica à vista.
   const copiaAntiga = ficha.isError || ficha.isPaused;
 
-  async function compartilhar() {
-    const url = linkDaFicha(postoId as string, asOf);
-    try {
-      await Share.share(Platform.OS === "ios" ? { url, message: nome } : { message: `${nome}\n${url}` });
-    } catch {
-      // Compartilhamento cancelado ou indisponível: nada a fazer.
-    }
-  }
-
   return (
     <Tela>
       <BarraTopo
         titulo="Ficha do posto"
         acoes={
           <>
-            <BotaoIcone rotuloAcessivel="Compartilhar esta ficha" icone="compartilhar" onPress={() => void compartilhar()} />
+            <BotaoIcone rotuloAcessivel="Compartilhar esta ficha" icone="compartilhar" onPress={() => setFolha("compartilhar")} />
             <BotaoIcone
               rotuloAcessivel={favorito ? "Remover dos favoritos" : "Adicionar aos favoritos"}
               accessibilityState={{ selected: favorito }}
@@ -137,7 +144,7 @@ export default function Ficha() {
           </View>
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.replace(`/postos/${encodeURIComponent(posto.posto_id)}`)}
+            onPress={() => verEm(null)}
             style={{ minHeight: TOQUE, justifyContent: "center" }}
           >
             <Texto variante="pequenoForte" cor={cores.petroleo} style={{ textDecorationLine: "underline" }}>
@@ -148,11 +155,19 @@ export default function Ficha() {
       ) : null}
 
       <View style={estilos.identificacao}>
-        {asOf ? null : (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${asOf ? "Visão histórica" : "Visão atual"}, dados conhecidos até ${dataBr(posto.as_of)}. Ver a ficha em outra data`}
+          onPress={() => setFolha("data")}
+          style={estilos.visao}
+        >
+          <Icone nome="relogio" tamanho={16} cor={cores.ambar} />
           <Texto variante="fonte" cor={cores.ambar}>
-            Visão atual · dados conhecidos até {dataBr(posto.as_of)}
+            {/* Na visão histórica a faixa âmbar acima já diz a data: aqui fica só a ação. */}
+            {asOf ? "Trocar a data da visão" : `Visão atual · dados conhecidos até ${dataBr(posto.as_of)}`}
           </Texto>
-        )}
+          <Icone nome="abaixo" tamanho={16} cor={cores.ambar} />
+        </Pressable>
         <Texto variante="titulo2" cor={cores.branco} accessibilityRole="header">
           {nome}
         </Texto>
@@ -235,11 +250,22 @@ export default function Ficha() {
         {aba === "posto" ? <SecaoDoPosto /> : null}
         {aba === "fontes" ? <SecaoFontes posto={posto} salvoEm={ficha.dataUpdatedAt} /> : null}
       </Corpo>
+
+      <FolhaOutraData visivel={folha === "data"} aoFechar={() => setFolha(null)} aoEscolher={verEm} />
+      <FolhaCompartilhar
+        visivel={folha === "compartilhar"}
+        aoFechar={() => setFolha(null)}
+        postoId={posto.posto_id}
+        nome={nome}
+        local={[nomeProprio(posto.municipio), posto.uf].filter(Boolean).join("/") || "local não informado"}
+        asOf={posto.as_of}
+      />
     </Tela>
   );
 }
 
 const estilos = StyleSheet.create({
+  visao: { flexDirection: "row", alignItems: "center", gap: 6, minHeight: TOQUE, alignSelf: "flex-start" },
   faixaHistorica: {
     flexDirection: "row",
     alignItems: "center",
@@ -248,7 +274,7 @@ const estilos = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: cores.ambar,
   },
-  identificacao: { backgroundColor: cores.petroleo, paddingHorizontal: 16, paddingBottom: 16, gap: 4 },
+  identificacao: { backgroundColor: cores.petroleo, paddingHorizontal: 16, paddingBottom: 16, gap: 4, marginTop: -6 },
   selos: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 },
   selo: {
     minHeight: 24,

@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { View } from "react-native";
 
 import { abrirFora, origemDoSite } from "@/lib/links";
@@ -60,6 +61,8 @@ export default function SobreOsDados() {
         <Aviso>{AVISO_INTERPRETACAO}</Aviso>
 
         <Cartao style={{ paddingVertical: 2, gap: 0 }}>
+          <LinhaNavegacao titulo="Canais oficiais" onPress={() => router.push("/guia/canais")} />
+          <LinhaNavegacao titulo="Como ler um resultado de ensaio" onPress={() => router.push("/guia/qualidade")} />
           <LinhaNavegacao
             titulo="Metodologia completa no portal"
             iconeDireita="externo"

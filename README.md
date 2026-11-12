@@ -67,6 +67,8 @@ que permite abrir o app num navegador e conferir as telas sem aparelho.
 | Alertas | `/alertas` | — (depende de serviço ainda inexistente) |
 | Conta e privacidade | `/conta` | — |
 | Sobre os dados | `/sobre` | — |
+| Canais oficiais | `/guia/canais?posto=` | — (lê a ficha já guardada) |
+| Como ler um resultado | `/guia/qualidade` | — |
 
 O app só chama operações marcadas `x-estado: implemented` no
 [`openapi.yaml`](https://github.com/joaopaulomirandamatias/plataforma-inteligencia-combustiveis-docs/blob/main/docs/api/openapi.yaml).
@@ -125,10 +127,15 @@ src/
 
 ## O que ainda não está aqui
 
-Mapa nativo com marcadores, visão em outra data com seletor, guia de direitos
-no posto, calculadora etanol × gasolina e as telas que dependem de backend novo
-(dados declarados pelo posto, alertas, conta com sincronização). O detalhe e a
-ordem estão no backlog do app, no repositório de docs.
+Mapa nativo com marcadores, os testes que o consumidor pode pedir no posto e o
+que conferir no local (dependem de conteúdo com referência jurídica revisada),
+calculadora etanol × gasolina e as telas que dependem de backend novo (dados
+declarados pelo posto, alertas, conta com sincronização). O detalhe e a ordem
+estão no backlog do app, no repositório de docs.
+
+A ficha abre em outra data pelo seletor no cabeçalho ou pelo parâmetro `as_of`
+do link. Quem decide o que existia naquele instante é a API: o app só envia a
+data e mostra o que voltar.
 
 Os identificadores de loja (`ios.bundleIdentifier`, `android.package`) ainda não
 estão definidos em `app.json`: precisam ser escolhidos antes do primeiro build
